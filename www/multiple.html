@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>多文件上传</title>
+	<script src='./jquery-3.2.1.min.js'></script>
+
+	<style>
+		*{margin:0;padding:0;}
+		#box{width:800px; min-height: 600px; border:1px black solid;}
+		#total{width:100px;min-height: 18px;border:1px black solid;}
+		.progress{width:100%;height: 18px;border:1px black solid;margin-top:5px; position: relative; box-sizing: border-box;}
+		.progress p.bar{width:0%; height:18px;background: green;  
+			}
+		.progress span{color:red; position: absolute;
+			top:-2px; left:50%;}
+	</style>
+</head>
+<body>
+	<div id='box'>
+		<input type="file" name="files" id="inp" multiple>
+		
+		<div id="total">
+			<!--
+			<div class="progress">
+				<p class="bar"></p>
+				<span>0</span>
+			</div>
+			<div class="progress">
+				<p class="bar"></p>
+				<span>0</span>
+			</div>
+			-->
+		</div>
+		
+		<button id="btn">上传</button>
+	
+	</div>
+
+
+<script>
+	$('#inp').change(function(){
+		
+		var files=$(this).get(0).files;  //文件数组
+		var files_len=files.length;    //上传的文件个数
+		for(var i=0; i<files_len; i++){
+			var $li=$('<div class="progress"><p class="bar"></p><span>0</span></div>');
+			$('#total').append($li);
+		}
+		var i=0;  //第一条记录
+		upload();
+		function upload(){
+			var formData = new FormData();
+			formData.append('jilu',i+1);
+			formData.append('total',files_len);
+			formData.append('file',files[i]);
+			$.ajax({
+				url:'/tijiao',
+				data:formData,
+				type:'post',
+				contentType:false,
+                processData:false,xhr:function(){  //监听用于上传显示进度
+					var xhr=$.ajaxSetting.xhr();
+					if(onprogress && xhr.upload){
+						xhr.upload.addEventListener("progress" , onprogress, false);
+               			return xhr;
+					}
+				},
+				success:function(data){
+					if(data==='go'){
+						i++;
+						upload();
+					}
+					else{
+						var $li=$('<p id="save_success" style="width:200px;min-height:40px;line-height:40px;'
+                                +'text-align:center;background:rgba(255,255,0,0.6);position:absolute;'
+                                +'z-index:999;left:50%;top:50%;margin-left:-100px;margin-top:-30px;'
+                                +'color:white;border-radius:8px;">全部上传成功</p>');
+                        $('body').append($li).fadeIn(100);
+                        setTimeout(function(){
+                            $('#save_success').remove();
+                        },2000);
+					}
+				}
+				
+			})
+		}
+		function onprogress(evt){
+			console.log(111);
+			/******
+		    var loaded = evt.loaded;   //已经上传大小情况 
+		    var tot = evt.total;   //附件总大小 
+		    var per = Math.floor(100*loaded/tot); //已经上传的百分比 
+		    $("#total .progress").eq(i).find('span').text(per +"%");
+		    $("#total .progress").eq(i).find("p.bar").width(per+"%");
+		    ****/
+		};
+	});
+</script>	
+</body>
+</html>

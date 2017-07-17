@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>单文件上传</title>
+	<script src='./jquery-3.2.1.min.js'></script>
+	<script src="./jquery.ui.widget.js"></script>  
+	<script src="./jquery.fileupload.js"></script>  
+	<script src="./jquery.iframe-transport.js"></script>
+	
+</head>
+<body>
+	<input type="file" name="files" id="inp" data-url='/tijiao'>
+	<div id="progress" style='width:100px;height: 18px;border:1px black solid'>
+	    <div class="bar" style="width: 0%; height:18px;background: green"></div>
+	</div>
+	<p id="p" style="width:100px;height:50px; color:red;">0</p>
+	<p id="rate" style="width:100px;height:50px; color:red;">0</p>
+
+
+<script>
+	$(function(){
+		
+		var upload=$('#inp').fileupload({
+			autoUpload:true,
+			done: function (e, data) {
+				console.log(data);
+				$('#p').text('完成。');
+	            //data.context.text('Upload finished.');
+	        },
+	        progressall: function (e, data) {  //所有文件总体上传进度
+		        var progress = parseInt(data.loaded / data.total * 100, 10);
+		        $('#p').text(progress+'%');
+		        $('#progress .bar').css(
+		            'width',
+		            progress + '%'
+		        );
+		        var curRate=data.bitrate/8;//将bit转为Byte
+			    var rate=curRate+'B/S';
+			    if(curRate>1024){
+			    	curRate=parseInt(curRate/1024);
+			    	rate=curRate+'KB/S';
+			    }
+			    if(curRate>1024){
+			    	curRate=parseInt(curRate/1024);
+			    	rate=curRate+'MB/S';
+			    }
+			    if(curRate>1024){
+			    	curRate=parseInt(curRate/1024);
+			    	rate=curRate+'GB/S';
+			    }
+			    $('#rate').text(rate);
+		    }
+		});
+				
+	})
+</script>	
+</body>
+</html>

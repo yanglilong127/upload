@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>file input</title>
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="./fileinput.css" type="text/css"/>
+	<link rel="stylesheet" href="./theme.min.css" type="text/css"/>
+	<script src='./jquery-3.2.1.min.js'></script>
+	<script src="./fileinput.min.js"></script>
+	<script src="./bootstrap.min.js"></script> 
+	<script src="./theme.min.js"></script>  
+	
+	<style>
+		#myform .col-sm-4 .kv-file-content{height: 100px;}
+		#myform .col-sm-4 .kv-file-content img.file-preview-image{height:50px;}
+	</style>
+</head>
+<body>
+<div class="form-group" id="myform">  
+    <label class="col-sm-2 control-label">图片上传:</label>  
+    <div class="col-sm-4">  
+        <input id="file" name="files" type="file" data-show-caption="true"  multiple>  
+        <p class="help-block">支持jpg、jpeg、png格式，大小不超过2.0M</p>  
+    </div>  
+
+    <p id="tip">0000</p>
+</div>  
+<script>
+	//注意：
+	//1：后台返回的必须是json格式数据
+	//
+	$('#file').fileinput({
+		language:'zh',  //设置语言
+		uploadUrl:'/tijiao',  //上传地址
+		allowedFileExtensions: ['jpg', 'gif', 'png','zip','js'],//接收的文件后缀
+		//uploadExtraData:{"id": 1, "fileName":'123.mp3'},
+		uploadAsync: true, //默认异步上传
+		showUpload:true,     //是否显示上传按钮
+		showRemove:true,     //是否显示移除按钮  
+		showPreview :true, //是否显示预览
+		showCaption:false,//是否显示标题
+		browseClass:"btn btn-primary", //按钮样式    
+		dropZoneEnabled: true,//是否显示拖拽区域
+		browseOnZoneClick:true,//浏览区域可点击
+		//minImageWidth: 50, //图片的最小宽度
+        //minImageHeight: 50,//图片的最小高度
+        //maxImageWidth: 1000,//图片的最大宽度
+        //maxImageHeight: 1000,//图片的最大高度
+		//maxFileSize:0,//单位为kb，如果为0表示不限制文件大小
+		//minFileCount: 0,
+		maxFileCount:10, //表示允许同时上传的最大文件个数
+		enctype:'multipart/form-data',
+		previewFileIcon: "<iclass='glyphicon glyphicon-king'></i>",
+	})
+	.on("filebatchselected", function(event, files) {
+		//选择文件后处理事件
+        //$(this).fileinput("upload");  会使挑选后就直接上传
+    })  
+    .on("fileuploaded", function(event, data) {
+    	//异步上传成功结果处理
+    	//或者同步上传所有后处理
+        $("#tip").text('over');        
+    });  
+</script>	
+</body>
+</html>

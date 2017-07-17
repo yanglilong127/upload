@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>test单文件上传</title>
+	<script src='./jquery-3.2.1.min.js'></script>
+	<script src="./jquery.ui.widget.js"></script>  
+	<script src="./jquery.fileupload.js"></script>  
+	<script src="./jquery.iframe-transport.js"></script>
+	<style>
+		*{margin:0;padding:0;}
+		#box{width:800px; min-height: 600px; border:1px black solid;}
+		#total{width:100px;min-height: 18px;border:1px black solid;}
+		.progress{width:100%;height: 18px;border:1px black solid;margin-top:5px; position: relative; box-sizing: border-box;}
+		.progress p.bar{width:0%; height:18px;background: green;  
+			}
+		.progress span.span1{color:red; position: absolute;
+			top:-2px; left:50%;}
+		.progress span.span2{color:red; position: absolute;
+			top:-2px; left:102%;}
+
+		.myfile{display: none}
+	</style>
+</head>
+<body>
+<div id='box'>
+	<input type="file" name="files" id="inp" multiple>
+	<form id="fileupload" action="/tijiao" method="POST" enctype="multipart/form-data">
+		<!--
+		<input type="file" name="file" class="myfile">-->
+	    <input id="btn" type="submit" value="上传">
+	</form>
+	
+	<div id="total">
+		<!--
+		<div class="progress">
+			<p class="bar"></p>  
+			<span class="span1">0</span>
+			<span class="span2">100kb/s</span>
+		</div>
+		<div class="progress">
+			<p class="bar"></p>
+			<span>0</span>
+		</div>
+		-->
+	</div>
+
+</div>
+<script>
+	$('#btn').click(function(){
+		var files=$('#inp').get(0).files; //获取input多文件
+		var files_len=files.length;  //文件个数
+		//将得到的多个文件对象赋值给多个input框
+		for(var i=0; i<files_len; i++){
+			var $myfile=$('<input type="file" name="file" class="myfile">');
+			$('body').append($myfile);
+			$('.myfile').eq(i).get(0).files[0]=files[i];
+			var $li=$('<div class="progress"><p class="bar"></p><span class="span1">0</span><span class="span2">0kb/s</span></div>');
+			$('#total').append($li);
+			//$('.myfile').eq(i).get(0).files[0].total=files_len;  //文件总个数
+		}
+		var index=0;  //第几个文件上传
+		sendFile();
+		function sendFile(){
+			$('#fileupload input.myfile').remove();
+			$('#fileupload input.myfile').append($('.myfile').eq(index).get(0));
+			$('#fileupload').fileupload({
+				formData:{example:'test'},
+				autoUpload:true,
+				done: function (e, data) {
+					$('#total .progress').eq(i).find('.span2').text(0);
+					index++;
+					if(i<files_len)
+						sendFile();
+		        },
+		        progressall: function (e, data) {  //所有文件总体上传进度
+			        var progress = parseInt(data.loaded / data.total * 100, 10);
+			        $('#p').text(progress);
+			        $('#progress .bar').css(
+			            'width',
+			            progress + '%'
+			        );
+			        var curRate=data.bitrate/8;//将bit转为Byte
+				    var rate=curRate+'B/S';
+				    if(curRate>1024){
+				    	curRate=parseInt(curRate/1024);
+				    	rate=curRate+'KB/S';
+				    }
+				    if(curRate>1024){
+				    	curRate=parseInt(curRate/1024);
+				    	rate=curRate+'MB/S';
+				    }
+				    if(curRate>1024){
+				    	curRate=parseInt(curRate/1024);
+				    	rate=curRate+'GB/S';
+				    }
+				    $('#total .progress').eq(i).find('.span2').text(rate);
+			    }
+			});
+		};
+	});
+	$('#fileupload').bind('fileuploadsubmit', function (e, data) {
+	    // The example input, doesn't have to be part of the upload form:
+	    var input = $('#fileupload #btn');
+	    data.formData = {example: input.val()};
+	    if (!data.formData.example) {
+	      data.context.find('button').prop('disabled', false);
+	      input.focus();
+	      return false;
+	    }
+	});
+</script>	
+</body>
+</html>
